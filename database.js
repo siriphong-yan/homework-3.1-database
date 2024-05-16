@@ -6,16 +6,19 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-const pool = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    database: 'student_database',
-    port: 3306,
-    password: '12345678',
-});
+const _createPool = () => {
+    return mysql.createPool({
+        host: 'localhost',
+        user: 'root',
+        database: 'student_database',
+        port: 3306,
+        password: '12345678',
+    });
+}
 
 app.get('/students', (req, res) => {
     try{
+        const pool = _createPool();
         pool.getConnection(function (err, connection) {
             if (err instanceof Error) {
                 console.log(err);
@@ -42,8 +45,9 @@ app.get('/students/:id', (req, res) => {
     try{
         if(req.params.id && Number(req.params.id)){
             let values = new Array();
-            values.push(req.params.id);;
+            values.push(req.params.id);
             
+            const pool = _createPool();
             pool.getConnection(function (err, connection) {
                 if (err instanceof Error) {
                     return res.status(500).send("internal error");
@@ -72,8 +76,9 @@ app.delete('/students/:id', (req, res) => {
     try{
         if(req.params.id && Number(req.params.id)){
             let values = new Array();
-            values.push(req.params.id);;
+            values.push(req.params.id);
             
+            const pool = _createPool();
             pool.getConnection(function (err, connection) {
                 if (err instanceof Error) {
                     return res.status(500).send("internal error");
@@ -122,6 +127,7 @@ app.put('/students/:id', (req, res) => {
 
             values = [].concat(newDataSetValue, where);
 
+            const pool = _createPool();
             pool.getConnection(function (err, connection) {
                 if (err instanceof Error) {
                     return res.status(500).send("internal error");
@@ -161,6 +167,7 @@ app.post('/students', (req, res) => {
         const email = req.body?.email;
 
         if(id && Number(id) && name && age && Number(age) && phone && email){
+            const pool = _createPool();
             pool.getConnection(function (err, connection) {
                 if (err instanceof Error) {
                     return res.status(500).send("internal error");
